@@ -7,13 +7,13 @@ from typing import Dict, Any
 
 import numpy as np
 
-from remake.babbling_explorer.explorer import Explorer
-from remake.config import TrainingDatasetGenerationConfig
-from remake.dataset_types import Episode, Transition, PlannerMode
-from remake.dataset_writer.dataset_schemas import SCHEMA_FROM_STR
-from remake.dataset_writer.writer_manager import WriterManager
-from remake.trajectory_generator.dataset_generator import DatasetGenerator
-from remake.wrapper import GymWrapper
+from babbling_explorer.explorer import Explorer
+from config import TrainingDatasetGenerationConfig
+from dataset_types import Episode, Transition, PlannerMode
+from dataset_writer.dataset_schemas import SCHEMA_FROM_STR
+from dataset_writer.writer_manager import WriterManager
+from trajectory_generator.dataset_generator import DatasetGenerator
+from wrapper import GymWrapper
 
 
 def env_dict(
