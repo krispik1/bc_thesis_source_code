@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from torch.utils.data import Dataset
 
-from remake.models.datasets import ForwardModelDataset, PretrainTrajectoryModelDataset, InverseModelDataset
+from models.datasets import ForwardModelDataset, PretrainTrajectoryModelDataset, InverseModelDataset
 
 
 def internal_sweep_dataset(
