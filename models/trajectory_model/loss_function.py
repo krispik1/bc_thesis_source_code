@@ -3,7 +3,7 @@ from typing import Tuple, Dict
 import torch
 import torch.nn.functional as F
 
-from remake.models.forward_model.loss_function import quaternion_chordal_loss
+from models.forward_model.loss_function import quaternion_chordal_loss
 
 def state_loss(
         prediction: Dict[str, torch.Tensor],
