@@ -3,8 +3,8 @@ from typing import Dict, Any
 import commentjson
 import multiprocessing as mp
 
-from remake.config import TrainingDatasetGenerationConfig
-from remake.worker import worker
+from config import TrainingDatasetGenerationConfig
+from worker import worker
 
 def load_config(
         path: str
