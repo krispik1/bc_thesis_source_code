@@ -1,6 +1,6 @@
 from typing import Dict, Any, List
 
-from remake.dataset_writer.dataset_schemas import Schema
+from dataset_writer.dataset_schemas import Schema
 
 class RowBuffer:
     """
