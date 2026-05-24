@@ -2,9 +2,9 @@ from typing import List, Dict, Tuple, Optional
 
 import numpy as np
 
-from remake.dataset_types import Region
-from remake.geometry_helper import dist
-from remake.wrapper import GymWrapper
+from dataset_types import Region
+from geometry_helper import dist
+from wrapper import GymWrapper
 
 
 def _neighbouring_keys(
