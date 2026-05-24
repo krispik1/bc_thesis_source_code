@@ -3,10 +3,10 @@ from typing import List, Tuple, Optional
 
 import numpy as np
 
-from remake.config import TrainingDatasetGenerationConfig
-from remake.dataset_types import PlannerMode
-from remake.trajectory_generator.policies.rrt_policy import RRTTrajectoryGenerator
-from remake.wrapper import GymWrapper
+from config import TrainingDatasetGenerationConfig
+from dataset_types import PlannerMode
+from trajectory_generator.policies.rrt_policy import RRTTrajectoryGenerator
+from wrapper import GymWrapper
 
 class Planner:
     def __init__(
