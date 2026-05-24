@@ -3,7 +3,7 @@ from typing import Dict, List
 
 import torch
 
-from remake.models.config import ModelTrainConfig
+from models.config import ModelTrainConfig
 
 
 @dataclass
