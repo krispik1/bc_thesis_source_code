@@ -7,8 +7,8 @@ from matplotlib import pyplot as plt
 from torch.utils.data import Dataset, DataLoader
 import h5py
 
-from remake.models.forward_model.forward_model import ForwardModel
-from remake.models.forward_model.forward_model_training import compute_forward_metrics
+from models.forward_model.forward_model import ForwardModel
+from models.forward_model.forward_model_training import compute_forward_metrics
 
 
 class ForwardModelRolloutDataset(Dataset):
