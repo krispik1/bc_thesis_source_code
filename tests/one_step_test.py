@@ -7,10 +7,10 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 
-from remake.models.create_datasets import internal_test_sets
-from remake.models.forward_model.forward_model import ForwardModel
-from remake.models.inverse_model.inverse_model import InverseModel
-from remake.models.forward_model.loss_function import quaternion_geodesic_loss
+from models.create_datasets import internal_test_sets
+from models.forward_model.forward_model import ForwardModel
+from models.inverse_model.inverse_model import InverseModel
+from models.forward_model.loss_function import quaternion_geodesic_loss
 
 
 def move_batch_to_device(
