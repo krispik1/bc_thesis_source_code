@@ -9,9 +9,9 @@ from matplotlib import pyplot as plt
 from torch import nn
 from torch.utils.data import DataLoader
 
-from remake.models.helpers import move_batch_to_device, create_optimizer, load_existing_keys
-from remake.models.inverse_model.config import InverseModelTrainConfig
-from remake.models.inverse_model.loss_function import inverse_model_loss
+from models.helpers import move_batch_to_device, create_optimizer, load_existing_keys
+from models.inverse_model.config import InverseModelTrainConfig
+from models.inverse_model.loss_function import inverse_model_loss
 
 
 @torch.no_grad()
