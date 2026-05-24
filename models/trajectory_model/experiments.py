@@ -6,10 +6,10 @@ from pathlib import Path
 import torch
 from torch.utils.data import DataLoader, Dataset
 
-from remake.models.helpers import setup_logger, load_existing_keys
-from remake.models.trajectory_model.config import TrajectoryModelTrainConfig
-from remake.models.trajectory_model.trajectory_model import TrajectoryModel
-from remake.models.trajectory_model.trajectory_model_training import fit_trajectory_model
+from models.helpers import setup_logger, load_existing_keys
+from models.trajectory_model.config import TrajectoryModelTrainConfig
+from models.trajectory_model.trajectory_model import TrajectoryModel
+from models.trajectory_model.trajectory_model_training import fit_trajectory_model
 
 
 def run_trajectory_model_experiments(
