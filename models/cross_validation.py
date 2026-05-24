@@ -10,20 +10,20 @@ from torch.utils.data import DataLoader
 
 
 
-from remake.models.config import ModelTrainConfig
-from remake.models.create_datasets import trajectory_k_fold_cross_validation_dataset_indices, \
+from models.config import ModelTrainConfig
+from models.create_datasets import trajectory_k_fold_cross_validation_dataset_indices, \
     internal_k_fold_cross_validation_dataset_indices
-from remake.models.datasets import PretrainTrajectoryModelDataset, InverseModelDataset, ForwardModelDataset
-from remake.models.forward_model.config import ForwardModelTrainConfig
-from remake.models.forward_model.forward_model import ForwardModel
-from remake.models.forward_model.forward_model_training import fit_forward_model
-from remake.models.helpers import setup_logger, load_existing_keys
-from remake.models.inverse_model.config import InverseModelTrainConfig
-from remake.models.inverse_model.inverse_model import InverseModel
-from remake.models.inverse_model.inverse_model_training import fit_inverse_model
-from remake.models.trajectory_model.config import TrajectoryModelTrainConfig
-from remake.models.trajectory_model.trajectory_model import TrajectoryModel
-from remake.models.trajectory_model.trajectory_model_training import fit_trajectory_model
+from models.datasets import PretrainTrajectoryModelDataset, InverseModelDataset, ForwardModelDataset
+from models.forward_model.config import ForwardModelTrainConfig
+from models.forward_model.forward_model import ForwardModel
+from models.forward_model.forward_model_training import fit_forward_model
+from models.helpers import setup_logger, load_existing_keys
+from models.inverse_model.config import InverseModelTrainConfig
+from models.inverse_model.inverse_model import InverseModel
+from models.inverse_model.inverse_model_training import fit_inverse_model
+from models.trajectory_model.config import TrajectoryModelTrainConfig
+from models.trajectory_model.trajectory_model import TrajectoryModel
+from models.trajectory_model.trajectory_model_training import fit_trajectory_model
 
 
 def cross_validation(
