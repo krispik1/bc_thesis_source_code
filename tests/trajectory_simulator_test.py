@@ -9,10 +9,10 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 
-from remake.wrapper import GymWrapper
-from remake.models.trajectory_model.trajectory_model import TrajectoryModel
-from remake.models.create_datasets import PretrainTrajectoryModelDataset
-from remake.models.trajectory_model.trajectory_model_training import move_batch_to_device
+from wrapper import GymWrapper
+from models.trajectory_model.trajectory_model import TrajectoryModel
+from models.create_datasets import PretrainTrajectoryModelDataset
+from models.trajectory_model.trajectory_model_training import move_batch_to_device
 
 
 EXECUTION_MODES = [
