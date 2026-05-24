@@ -9,9 +9,9 @@ from matplotlib import pyplot as plt
 from torch import nn
 from torch.utils.data import DataLoader
 
-from remake.models.forward_model.config import ForwardModelTrainConfig
-from remake.models.forward_model.loss_function import quaternion_geodesic_loss, forward_model_loss
-from remake.models.helpers import move_batch_to_device, create_optimizer, load_existing_keys
+from models.forward_model.config import ForwardModelTrainConfig
+from models.forward_model.loss_function import quaternion_geodesic_loss, forward_model_loss
+from models.helpers import move_batch_to_device, create_optimizer, load_existing_keys
 
 
 @torch.no_grad()
