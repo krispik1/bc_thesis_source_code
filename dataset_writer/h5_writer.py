@@ -4,7 +4,7 @@ from typing import Dict, List
 import h5py
 import numpy as np
 
-from remake.dataset_writer.dataset_schemas import Schema, ColumnSpecification
+from dataset_writer.dataset_schemas import Schema, ColumnSpecification
 
 
 class H5Writer:
