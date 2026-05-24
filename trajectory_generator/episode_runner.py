@@ -2,10 +2,10 @@ from typing import List
 
 import numpy as np
 
-from remake.config import TrainingDatasetGenerationConfig
-from remake.dataset_types import Episode, Transition, PlannerMode, PlannerPolicy
-from remake.geometry_helper import dist
-from remake.wrapper import get_action_vector, GymWrapper
+from config import TrainingDatasetGenerationConfig
+from dataset_types import Episode, Transition, PlannerMode, PlannerPolicy
+from geometry_helper import dist
+from wrapper import get_action_vector, GymWrapper
 
 
 class EpisodeRunner:
