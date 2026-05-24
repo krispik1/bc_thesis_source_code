@@ -3,8 +3,8 @@ from pathlib import Path
 import pandas as pd
 from matplotlib import pyplot as plt
 
-from remake.models.create_datasets import trajectory_sweep_dataset
-from remake.models.trajectory_model.experiments import run_trajectory_model_experiments
+from models.create_datasets import trajectory_sweep_dataset
+from models.trajectory_model.experiments import run_trajectory_model_experiments
 
 BASE_DIR = Path("trajectory/runs12")
 DATA_DIR = Path("dataset/trajectory2.0")
