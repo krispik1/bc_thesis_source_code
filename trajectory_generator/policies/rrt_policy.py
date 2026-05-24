@@ -2,11 +2,11 @@ from typing import Tuple, List
 
 import numpy as np
 
-from remake.config import TrainingDatasetGenerationConfig
-from remake.dataset_types import PlannerMode
-from remake.trajectory_generator.policies.one_euro_filter import OneEuroFilter
-from remake.wrapper import GymWrapper
-from remake.geometry_helper import dist
+from config import TrainingDatasetGenerationConfig
+from dataset_types import PlannerMode
+from trajectory_generator.policies.one_euro_filter import OneEuroFilter
+from wrapper import GymWrapper
+from geometry_helper import dist
 
 
 def _is_jagged_triangle(
