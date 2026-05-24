@@ -6,10 +6,10 @@ from pathlib import Path
 import torch
 from torch.utils.data import DataLoader, Dataset
 
-from remake.models.forward_model.config import ForwardModelTrainConfig
-from remake.models.forward_model.forward_model import ForwardModel
-from remake.models.forward_model.forward_model_training import fit_forward_model
-from remake.models.helpers import setup_logger, load_existing_keys
+from models.forward_model.config import ForwardModelTrainConfig
+from models.forward_model.forward_model import ForwardModel
+from models.forward_model.forward_model_training import fit_forward_model
+from models.helpers import setup_logger, load_existing_keys
 
 
 def run_forward_model_experiments(
