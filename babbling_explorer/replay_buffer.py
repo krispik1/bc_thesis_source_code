@@ -1,7 +1,7 @@
 import random
 from typing import List
 
-from remake.dataset_types import Transition
+from dataset_types import Transition
 
 class ReplayBuffer:
 
