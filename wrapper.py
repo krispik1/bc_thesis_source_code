@@ -1,9 +1,9 @@
 import numpy as np
 from typing import Dict, Any, List, Tuple
 
-from remake.dataset_types import State, Action
-from remake.geometry_helper import point_to_object_distance, perpendicular_basis, project_point_outside_object, dist
-from mygym.myGym.envs.env_object import EnvObject
+from dataset_types import State, Action
+from geometry_helper import point_to_object_distance, perpendicular_basis, project_point_outside_object, dist
+from myGym.envs.env_object import EnvObject
 from mygym.myGym.envs.gym_env import GymEnv
 
 def get_action_vector(
