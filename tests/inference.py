@@ -7,11 +7,11 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader, ConcatDataset
 
-from remake.models.create_datasets import internal_test_sets
-from remake.models.forward_model.forward_model import ForwardModel
-from remake.models.inverse_model.inverse_model import InverseModel
-from remake.models.trajectory_model.trajectory_model import TrajectoryModel
-from remake.models.create_datasets import PretrainTrajectoryModelDataset
+from models.create_datasets import internal_test_sets
+from models.forward_model.forward_model import ForwardModel
+from models.inverse_model.inverse_model import InverseModel
+from models.trajectory_model.trajectory_model import TrajectoryModel
+from models.create_datasets import PretrainTrajectoryModelDataset
 
 
 def move_batch_to_device(
