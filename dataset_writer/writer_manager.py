@@ -1,9 +1,9 @@
 from pathlib import Path
 from typing import Dict, Any
 
-from remake.dataset_writer.buffer import RowBuffer
-from remake.dataset_writer.dataset_schemas import Schema
-from remake.dataset_writer.h5_writer import H5Writer
+from dataset_writer.buffer import RowBuffer
+from dataset_writer.dataset_schemas import Schema
+from dataset_writer.h5_writer import H5Writer
 
 
 class WriterManager:
