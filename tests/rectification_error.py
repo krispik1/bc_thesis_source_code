@@ -6,10 +6,10 @@ import torch
 from matplotlib import pyplot as plt
 from torch.utils.data import DataLoader
 
-from remake.models.forward_model.forward_model import ForwardModel
-from remake.models.create_datasets import trajectory_sweep_dataset
-from remake.models.inverse_model.inverse_model import InverseModel
-from remake.models.trajectory_model.trajectory_model_training import move_batch_to_device, rectify_trajectory, compute_rectification_mae
+from models.forward_model.forward_model import ForwardModel
+from models.create_datasets import trajectory_sweep_dataset
+from models.inverse_model.inverse_model import InverseModel
+from models.trajectory_model.trajectory_model_training import move_batch_to_device, rectify_trajectory, compute_rectification_mae
 
 
 @torch.no_grad()
