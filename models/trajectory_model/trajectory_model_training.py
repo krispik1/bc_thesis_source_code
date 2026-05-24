@@ -9,12 +9,12 @@ from matplotlib import pyplot as plt
 from torch import nn
 from torch.utils.data import DataLoader
 
-from remake.models.forward_model.forward_model import ForwardModel
-from remake.models.forward_model.loss_function import quaternion_geodesic_loss
-from remake.models.helpers import move_batch_to_device, create_optimizer, load_existing_keys
-from remake.models.inverse_model.inverse_model import InverseModel
-from remake.models.trajectory_model.config import TrajectoryModelTrainConfig
-from remake.models.trajectory_model.loss_function import trajectory_model_loss
+from models.forward_model.forward_model import ForwardModel
+from models.forward_model.loss_function import quaternion_geodesic_loss
+from models.helpers import move_batch_to_device, create_optimizer, load_existing_keys
+from models.inverse_model.inverse_model import InverseModel
+from models.trajectory_model.config import TrajectoryModelTrainConfig
+from models.trajectory_model.loss_function import trajectory_model_loss
 
 @torch.no_grad()
 def compute_rectification_mae(
