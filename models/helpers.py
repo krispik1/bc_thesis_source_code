@@ -6,7 +6,7 @@ from typing import Dict, Set, Any
 import torch
 from torch import nn
 
-from remake.models.config import ModelTrainConfig
+from models.config import ModelTrainConfig
 
 
 def setup_logger(
