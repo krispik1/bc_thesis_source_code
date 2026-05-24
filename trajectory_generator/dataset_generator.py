@@ -1,10 +1,10 @@
 from typing import Optional
 
-from remake.config import TrainingDatasetGenerationConfig
-from remake.dataset_types import Episode, PlannerMode
-from remake.trajectory_generator.episode_runner import EpisodeRunner
-from remake.trajectory_generator.planner import Planner
-from remake.wrapper import GymWrapper
+from config import TrainingDatasetGenerationConfig
+from dataset_types import Episode, PlannerMode
+from trajectory_generator.episode_runner import EpisodeRunner
+from trajectory_generator.planner import Planner
+from wrapper import GymWrapper
 
 class DatasetGenerator:
 
