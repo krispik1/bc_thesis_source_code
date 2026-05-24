@@ -3,13 +3,13 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 
-from remake.config import TrainingDatasetGenerationConfig
-from remake.dataset_types import Action, Episode, Region, Transition, PlannerPolicy, PlannerMode
-from remake.babbling_explorer.poisson_sampler import PoissonSampler
-from remake.babbling_explorer.proxy_ensemble import ProxyEnsemble,  flatten_state
-from remake.babbling_explorer.replay_buffer import ReplayBuffer
-from remake.geometry_helper import dist
-from remake.wrapper import GymWrapper, get_action_vector
+from config import TrainingDatasetGenerationConfig
+from dataset_types import Action, Episode, Region, Transition, PlannerPolicy, PlannerMode
+from babbling_explorer.poisson_sampler import PoissonSampler
+from babbling_explorer.proxy_ensemble import ProxyEnsemble,  flatten_state
+from babbling_explorer.replay_buffer import ReplayBuffer
+from geometry_helper import dist
+from wrapper import GymWrapper, get_action_vector
 
 def sample_unit_vector(
         dimension: int,
