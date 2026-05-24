@@ -6,9 +6,9 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 
-from remake.models.trajectory_model.trajectory_model import TrajectoryModel
-from remake.models.create_datasets import PretrainTrajectoryModelDataset
-from remake.models.trajectory_model.trajectory_model_training import move_batch_to_device, compute_tail_metrics, compute_angle_metrics
+from models.trajectory_model.trajectory_model import TrajectoryModel
+from models.create_datasets import PretrainTrajectoryModelDataset
+from models.trajectory_model.trajectory_model_training import move_batch_to_device, compute_tail_metrics, compute_angle_metrics
 
 
 @torch.no_grad()
