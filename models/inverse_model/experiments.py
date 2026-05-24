@@ -5,10 +5,10 @@ from pathlib import Path
 
 import torch
 from torch.utils.data import DataLoader, Dataset
-from remake.models.helpers import setup_logger, load_existing_keys
-from remake.models.inverse_model.config import InverseModelTrainConfig
-from remake.models.inverse_model.inverse_model import InverseModel
-from remake.models.inverse_model.inverse_model_training import fit_inverse_model
+from models.helpers import setup_logger, load_existing_keys
+from models.inverse_model.config import InverseModelTrainConfig
+from models.inverse_model.inverse_model import InverseModel
+from models.inverse_model.inverse_model_training import fit_inverse_model
 
 
 def run_inverse_model_experiments(
