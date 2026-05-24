@@ -5,7 +5,7 @@ import torch
 from torch import nn
 import torch.optim as optim
 
-from remake.dataset_types import Transition, Action, State
+from dataset_types import Transition, Action, State
 
 def flatten_state(
         state: State,
