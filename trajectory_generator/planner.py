@@ -24,7 +24,7 @@ class Planner:
         self.env = env
         self.cfg = cfg
 
-        self.planner_mode = PlannerMode.DIRECT
+        self.planner_mode = PlannerMode.AVOID
 
         # Initialize trajectory generator
         self.rtt_gen = RRTTrajectoryGenerator(env, self.cfg)
@@ -37,11 +37,11 @@ class Planner:
             current_collision_ratio: float
     ) -> None:
         """
-        Used to choose a mode of the planner, whether it plans a colliding, avoiding and direct trajectory.
+        Used to choose a mode of the planner, whether it plans a colliding and avoiding trajectory.
         """
-        # Always try direct approach first
+        # Always try to avoid approach first
         if current_collision_ratio == 0:
-            self.planner_mode = PlannerMode.DIRECT
+            self.planner_mode = PlannerMode.AVOID
 
         # Based on target vs current ratio, bias the modes but allow both
         if current_collision_ratio < self.target_collision_ratio:
@@ -95,6 +95,8 @@ class Planner:
         :return: Joints angle trajectory if one was found and number of detour waypoints in it.
         """
         start_pos = self.env.robot.calculate_accurate_IK(end_effector_pos=self.env.ee_init_pose)
+        if start_pos is None:
+            return None, 0
         goal_poses = self.env.goal_poses
 
         # Choose AVOID or COLLIDE based on ratio in generated dataset so far
@@ -111,7 +113,10 @@ class Planner:
 
         # If COLLIDE, choose a goal pose leading to collision, otherwise choose goal pose to reach goal object
         if self.planner_mode == PlannerMode.COLLIDE:
-            goal_poses = [self.env.robot.calculate_accurate_IK(end_effector_pos=self.env.find_ee_position_for_link_collision())]
+            pose = self.env.robot.calculate_accurate_IK(end_effector_pos=self.env.find_ee_position_for_link_collision())
+            if pose is None:
+                return None, 0
+            goal_poses = [pose]
         else:
             goal_poses = goal_poses
 
@@ -125,6 +130,8 @@ class Planner:
             self.env.show_waypoint_marker(w)
         if detour_waypoints:
             waypoints += [self.env.robot.calculate_accurate_IK(end_effector_pos=detour_waypoint) for detour_waypoint in detour_waypoints]
+            if any(x is None for x in waypoints):
+                return None, 0
 
         # For each goal pose, try to find trajectory
         for goal_pose in goal_poses:
@@ -143,6 +150,8 @@ class Planner:
                     waypoints_for_goal_pose[i + 1],
                     self.planner_mode
                 )
+                if any(x is None for x in traj):
+                    return None, 0
 
             # If trajectory was found, return it with number of waypoints
             if traj:

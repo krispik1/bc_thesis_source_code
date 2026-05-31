@@ -73,9 +73,11 @@
   "magnet_probability"              : 0.5,
   "obstacle_present"                : 0,
 
-  "n_trajectories"  : 1401,
+  "modes": ["trajectory", "babbling"],
+  "n_datapoints_per_mode": [12000, 500000],
+  "n_episodes_per_setup_per_mode": [1, 1],
 
-  "target_collision_ratio"    : 0.5,
+  "target_collision_ratio"    : 0.0,
   "target_n_waypoints_ratio"  : [1.0, 0.0, 0.0, 0.0],
 
   "episode_horizon"           : 20,
@@ -92,9 +94,8 @@
   "lam"                                         : 0.25,
   "max_restarts_rrt_planning"                   : 5,
 
-  "n_observations"                    : 5,
-  "interval_n_steps_per_exploration"  : [1, 2],
-  "region_ratio"                      : [0, 0, 1],
+  "interval_n_steps_per_exploration"  : [1, 1],
+  "region_ratio"                      : [0.35, 0.45, 0.2],
   "n_candidates"                      : 8,
 
   "n_models"                  : 5,
@@ -120,5 +121,5 @@
 
   "buffer_size" : 1024,
 
-  "n_workers" : 1
+  "n_workers_per_mode" : [6, 1]
 }

@@ -19,7 +19,7 @@ class ForwardModelRolloutDataset(Dataset):
         master_index_df_path: str,
         max_rollout_steps: int = 20,
         seed: int = 1,
-        obstacle_active: int | None = None,
+        obstacle_active: int = None,
     ):
         self.h5_path = h5_path
         self.max_rollout_steps = max_rollout_steps
@@ -258,6 +258,30 @@ def test_rollout_error(
 
     return results
 
+MODEL_PATHS = {
+    "FM1": "forward.pt",
+    "FM2": "forward2.pt",
+}
+
+OBSTACLE_PRESENT = {
+    1: "obstacle",
+    0: "no_obstacle",
+}
+
+SEEDS = [1, 2, 3, 4, 5]
+
+PLOT_DIR = Path("plots/rollout")
+
+DATA_DIR = Path(
+        "dataset/data"
+    )
+
+H5_PATH = str(DATA_DIR / "trajectory_dataset.h5")
+MASTER_IDX_PATH = str(DATA_DIR / "trajectory_master_index.csv")
+
+CSV_PATH = PLOT_DIR / "rollout_results.csv"
+LATEX_PATH = PLOT_DIR / "rollout_results.tex"
+
 if __name__ == "__main__":
     name_dict = {
         "configuration_mae" : r'$\mathbf{\theta}$ MAE[rad]',
@@ -270,22 +294,9 @@ if __name__ == "__main__":
         "obstacle6D_rotation_mae": r'$\mathbf{o}_{R}$ error[rad]',
     }
 
-    device = "cpu"
+    device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    MODEL_PATHS = {
-        "FM1": "forward.pt",
-        "FM2": "forward2.pt",
-    }
-
-    OBSTACLE_PRESENT = {
-        1: "obstacle",
-        0: "no_obstacle",
-    }
-
-    seeds = [1, 2, 3, 4, 5]
-
-    plot_dir = Path("plots/rollout")
-    plot_dir.mkdir(parents=True, exist_ok=True)
+    PLOT_DIR.mkdir(parents=True, exist_ok=True)
 
     table_rows = []
 
@@ -315,10 +326,10 @@ if __name__ == "__main__":
 
         all_results = []
 
-        for seed in seeds:
+        for seed in SEEDS:
             rollout_dataset = ForwardModelRolloutDataset(
-                h5_path="data/trajectory_dataset.h5",
-                master_index_df_path="data/trajectory_master_index.csv",
+                h5_path=H5_PATH,
+                master_index_df_path=MASTER_IDX_PATH,
                 max_rollout_steps=20,
                 seed=seed,
                 obstacle_active=obstacle_active,
@@ -398,7 +409,7 @@ if __name__ == "__main__":
             safe_model_name = model_name.replace(" ", "_").replace("+", "plus")
 
             plt.savefig(
-                plot_dir / f"{safe_model_name}_both_{metric_name}_rollout.pdf"
+                PLOT_DIR / f"{safe_model_name}_both_{metric_name}_rollout.pdf"
             )
 
             plt.close()
@@ -407,13 +418,10 @@ if __name__ == "__main__":
 
     df = pd.DataFrame(table_rows)
 
-    csv_path = plot_dir / "rollout_results.csv"
-    latex_path = plot_dir / "rollout_results.tex"
-
-    df.to_csv(csv_path, index=False)
+    df.to_csv(CSV_PATH, index=False)
 
     df.to_latex(
-        latex_path,
+        LATEX_PATH,
         index=False,
         escape=False,
     )

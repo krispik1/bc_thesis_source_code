@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import Tuple, List, Optional
 
 import numpy as np
 
@@ -658,7 +658,7 @@ class RRTTrajectoryGenerator:
             q_start: np.ndarray,
             q_goal: np.ndarray,
             mode: PlannerMode
-    ) -> List[np.ndarray]:
+    ) -> Optional[List[np.ndarray]]:
         """
         Plans a trajectory based on the selected planner mode using a Rapidly-exploring Random Tree.
 
@@ -676,4 +676,4 @@ class RRTTrajectoryGenerator:
         if traj:
             return traj
 
-        return []
+        return None

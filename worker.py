@@ -1,7 +1,6 @@
 import logging
 import signal
 import sys
-import time
 from pathlib import Path
 from typing import Dict, Any
 
@@ -9,12 +8,11 @@ import numpy as np
 
 from babbling_explorer.explorer import Explorer
 from config import TrainingDatasetGenerationConfig
-from dataset_types import Episode, Transition, PlannerMode
+from dataset_types import Episode, Transition
 from dataset_writer.dataset_schemas import SCHEMA_FROM_STR
 from dataset_writer.writer_manager import WriterManager
 from trajectory_generator.dataset_generator import DatasetGenerator
 from wrapper import GymWrapper
-
 
 def env_dict(
         env : GymWrapper,
@@ -44,20 +42,20 @@ def env_dict(
     }
 
 def episode_dict(
-        worker_id: int,
+        env_id: int,
         transition_index: int,
         episode: Episode,
 ) -> Dict[str, Any]:
     """
     Creates a dictionary based on Episode Table schema using information from Episode.
 
-    :param worker_id: Worker's id that represents the environment's id.
+    :param env_id: Environment setup's id.
     :param transition_index: Number of transitions stored in the HDF5 file.
     :param episode: Run episode description.
     :return: Dictionary used to store data into Episode Schema Table.
     """
     return {
-        "env_id": worker_id,
+        "env_id": env_id,
         "ep_start": transition_index,
         "ep_len": len(episode.transitions) + 1,
         "planner": episode.planner_policy,
@@ -133,18 +131,19 @@ def final_observation_transition_dict(
 
 def setup_worker_logger(
         worker_id: int,
-        mode: str
+        run_mode_dir: str
 ) -> logging.Logger:
     """
     Sets up logger for the worker using library logging.
 
+    :param run_mode_dir: Directory where log files are stored.
     :param worker_id: Worker's id.
     :return: Logger.
     """
     logger = logging.getLogger(f"worker_{worker_id}")
     logger.setLevel(logging.INFO)
 
-    handler = logging.FileHandler(f"logs/{mode}/worker_{worker_id}.log")
+    handler = logging.FileHandler(Path(run_mode_dir) / f"logs/worker_{worker_id}.log")
     # Logs time, id of the worker and given message
     formatter = logging.Formatter(
         "%(asctime)s [%(levelname)s] [worker %(name)s] %(message)s"
@@ -159,8 +158,9 @@ def worker(
         worker_id: int,
         config: TrainingDatasetGenerationConfig,
         mode: str,
-        n_trajectories_per_worker: int = 0,
-        n_babbles_per_worker: int = 0
+        run_mode_dir: str,
+        n_datapoints: int,
+        n_episodes_per_setup: int,
 ) -> None:
     """
     Function that represents one worker. A worker creates its writers, environment and logger and closes them after
@@ -169,15 +169,16 @@ def worker(
 
     After each episode, worker logs trajectory's index or number of observations based on the current mode.
 
-    :param n_babbles_per_worker: Number of babbling observations per worker.
-    :param n_trajectories_per_worker: Number of trajectories per worker.
+    :param n_episodes_per_setup: Number of episodes per environment setup.
+    :param n_datapoints: Number of datapoints to generate.
     :param mode: Babbling or trajectory mode.
+    :param run_mode_dir: Directory where files are stored from current run.
     :param worker_id: Worker's id.
     :param config: Config to initialize the dataset generation.
     """
 
     writers : Dict[str, WriterManager] = {}
-    logger = setup_worker_logger(worker_id, mode)
+    logger = setup_worker_logger(worker_id, run_mode_dir)
     env = GymWrapper(config.env_config, config.magnet_probability)
     cleaned_up = False
 
@@ -219,10 +220,11 @@ def worker(
         for schema in [SCHEMA_FROM_STR[s] for s in config.schemas]:
             writers[schema.name] = WriterManager(
                 schema=schema,
-                path=Path(f"{config.path}/{mode}/worker_{worker_id}.h5"),
+                path=Path(Path(run_mode_dir) / f"worker_{worker_id}.h5"),
                 chunks=config.chunks,
                 buffer_size=config.buffer_size
             )
+
     except Exception as e:
         print(f"Worker {worker_id} failed: {e}")
         raise
@@ -231,18 +233,13 @@ def worker(
         # Count total transitions stored in HDF5 file
         total_transitions = 0 + writers["transitions"].get_size()
 
+        env_id = -1 + writers["env"].get_size()
+
         # Log start in which mode and count trajectories/observations based on mode
         logger.info(f"Worker {worker_id} starts generating in {mode} mode.")
-        counter = 0
 
-        if mode == "babbling":
-            n_runs = n_babbles_per_worker
-            n_episodes = 1
-        else:
-            n_runs = n_trajectories_per_worker
-            n_episodes = 1
-
-        avoid_collide_ratio = [0, 0]
+        datapoint_counter = 0
+        n_episodes = n_episodes_per_setup
 
         if mode == "babbling":
             env.reset_until_reachable()
@@ -251,30 +248,30 @@ def worker(
                 env=env,
                 cfg=config,
             )
-        else:
+
+        elif mode == "trajectory":
             # If trajectory, use generator
             generator = DatasetGenerator(
                 env=env,
                 cfg=config
             )
 
+        else:
+            raise Exception("Unknown mode.")
+
         # Generate until we have enough data
-        while counter < n_runs:
+        while datapoint_counter < n_datapoints:
 
-            n = 0
+            episode_counter = 0
 
-            while n < n_episodes:
-                if mode == "babbling":
-                    if n == 0:
-                        planner_mode = "next"
-                    else:
-                        planner_mode = "prev"
+            while episode_counter < n_episodes:
+                if episode_counter == 0:
+                    change_setup = True
                 else:
-                    planner_mode = PlannerMode.COLLIDE
+                    change_setup = False
 
-                time.sleep(0.9)
-                episode = generator.collect_data(planner_mode)
-                time.sleep(0.9)
+                episode = generator.collect_data(change_setup)
+
                 # If no episode was run (no trajectory was found, babbling episode did not meet conditions, etc.), skip
                 if episode is None:
                     continue
@@ -282,31 +279,35 @@ def worker(
                 env = generator.env
 
                 # Store environment properties
-                writers["env"].save_data(env_dict(env, config.env_config))
+                if change_setup:
+                    env_id += 1
+                    writers["env"].save_data(env_dict(env, config.env_config))
 
                 # Store episode data, using total_transitions as pointer to start of episode in transitions table
-                writers["episodes"].save_data(episode_dict(worker_id, total_transitions, episode))
+                writers["episodes"].save_data(episode_dict(env_id, total_transitions, episode))
                 # + 1 for last state + zero action observation
                 total_transitions += len(episode.transitions) + 1
 
                 # Store episode state t + action t observations and last state + zero action observation
                 for transition in episode.transitions:
                     writers["transitions"].save_data(transition_dict(transition))
-                writers["transitions"].save_data(final_observation_transition_dict(episode.transitions[len(episode.transitions) - 1]))
+                writers["transitions"].save_data(
+                    final_observation_transition_dict(episode.transitions[len(episode.transitions) - 1])
+                )
 
                 # Update counter based on mode and log info
                 if mode == "babbling":
-                    counter += len(episode.transitions)
-                    n += len(episode.transitions)
-                    logger.info(f"Worker {worker_id} generated {counter} babbling transitions.")
-                else:
-                    n += 1
-                    counter += 1
-                    if episode.episode_collision:
-                        avoid_collide_ratio[1] += 1
-                    else:
-                        avoid_collide_ratio[0] += 1
-                    logger.info(f"Worker {worker_id} generated trajectory episode {counter}.")
+                    episode_counter += 1
+                    datapoint_counter += len(episode.transitions)
+
+                    logger.info(f"Worker {worker_id} generated {datapoint_counter} babbling transitions.")
+
+                elif mode == "trajectory":
+                    episode_counter += 1
+                    datapoint_counter += 1
+
+                    logger.info(f"Worker {worker_id} generated trajectory episode {datapoint_counter}.")
+
     except SystemExit:
         raise
     finally:

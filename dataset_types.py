@@ -55,16 +55,13 @@ OBSTACLE_TO_STR = {v: k for k, v in OBSTACLE_FROM_STR.items()}
 class PlannerMode(IntEnum):
     """
     Integer enum representing the planner mode:
-        - DIRECT - plans direct trajectory to the goal object,
         - AVOID - plans trajectory avoiding the obstacle to the goal object,
         - COLLIDE - plans trajectory colliding with the obstacle.
     """
-    DIRECT = 0
-    AVOID = 1
-    COLLIDE = 2
+    AVOID = 0
+    COLLIDE = 1
 
 PLANNER_MODE_FROM_STR = {
-    "direct": PlannerMode.DIRECT,
     "avoid": PlannerMode.AVOID,
     "collide": PlannerMode.COLLIDE,
 }

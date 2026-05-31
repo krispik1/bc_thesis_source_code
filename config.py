@@ -14,9 +14,15 @@ class TrainingDatasetGenerationConfig(BaseModel):
         (General)
         - obstacle_present - obstacle absence flag
 
+    Mode of data generation configuration:
+        (ParentLauncher)
+        - modes - modes of generation (whether trajectories or babbling is generated),
+        - n_datapoints_per_mode - number of datapoints (trajectories or babbling observations) per mode generated,
+        - n_episodes_per_setup_per_mode - number of episodes per one setup of environment (poses of the objects in env),
+        for babbling, horizon of one episode is randomly chosen from interval_n_steps_per_exploration, for trajectories,
+        horizon of one episode is length of the generated trajectory.
+
     Trajectory dataset generator configuration:
-        (Dataset Generator)
-        - n_trajectories - number of trajectories to generate per env,
         (Planner)
         - target_collision_ratio - ratio of colliding vs non-colliding trajectories to be reached in generated dataset,
         - target_n_waypoints_ratio - ratio of waypoint numbers used to plan trajectories to be reached in generated dataset,
@@ -71,7 +77,7 @@ class TrainingDatasetGenerationConfig(BaseModel):
         - buffer_size - size of buffer used by HDF5 writers.
 
     Multiprocessing config:
-        - n_workers - number of processes
+        - n_workers_per_mode - number of processes per data generation mode.
     """
     # Environment configuration
     env_config: Dict[str, Any]
@@ -79,9 +85,12 @@ class TrainingDatasetGenerationConfig(BaseModel):
     magnet_probability: float
     obstacle_present: int
 
-    # Trajectory generator configuration
-    n_trajectories: int
+    # Different mode/dataset generation configurations
+    modes: List[str]
+    n_datapoints_per_mode: List[int]
+    n_episodes_per_setup_per_mode: List[int]
 
+    # Trajectory generator configuration
     target_collision_ratio: float
     target_n_waypoints_ratio: List[float]
 
@@ -100,7 +109,6 @@ class TrainingDatasetGenerationConfig(BaseModel):
     max_restarts_rrt_planning: int
 
     # Explorer configuration
-    n_observations: int
     interval_n_steps_per_exploration: Tuple[int, int]
     region_ratio: Tuple[float, float, float]
     n_candidates: int
@@ -130,4 +138,4 @@ class TrainingDatasetGenerationConfig(BaseModel):
     buffer_size: int
 
     # Multiprocessing configuration
-    n_workers: int
+    n_workers_per_mode: List[int]

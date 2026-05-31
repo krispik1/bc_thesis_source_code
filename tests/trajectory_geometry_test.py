@@ -241,31 +241,41 @@ def format_mean_std(
 ) -> str:
     return f"{mean:.6f} ± {std:.6f}"
 
+DATA_DIR = Path(
+        "dataset/test_trajectory"
+    )
+
+H5_PATH = str(DATA_DIR / "worker_1.h5")
+MASTER_IDX_PATH = str(DATA_DIR / "test_trajectory_master_index.csv")
+
+OUTPUT_DIR = Path("plots/trajectory_quality")
+
+# Tests checkpoints at given EPOCHS
+MODEL_RUNS = {
+    "TM1": "final/small",
+    "TM2": "final/large",
+    "TM3": "final/priors",
+    "TM4": "final/pretraining",
+    "TM5": "final/supervised",
+}
+
+EPOCHS = [10, 20, 30, 40, 50]
+SEEDS = [1, 2, 3, 4, 5]
+
+RAW_CSV_PATH = OUTPUT_DIR / "trajectory_quality_raw_seed_results.csv"
+
+FULL_CSV_PATH = OUTPUT_DIR / "trajectory_quality_all_epochs.csv"
+FULL_LATEX_PATH = OUTPUT_DIR / "trajectory_quality_all_epochs.tex"
+
+# Best checkpoint for each model
+BEST_CSV_PATH = OUTPUT_DIR / "trajectory_quality_best_epochs.csv"
+BEST_LATEX_PATH = OUTPUT_DIR / "trajectory_quality_best_epochs.tex"
 
 if __name__ == "__main__":
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    DATA_DIR = Path(
-        "dataset/test_trajectory"
-    )
-
-    h5_path = str(DATA_DIR / "worker_1.h5")
-    master_index_path = str(DATA_DIR / "test_trajectory_master_index.csv")
-
-    output_dir = Path("plots/trajectory_quality")
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    MODEL_RUNS = {
-        "TM1": "final/small",
-        "TM2": "final/large",
-        "TM3": "final/priors",
-        "TM4": "final/pretraining",
-        "TM5": "final/supervised",
-    }
-
-    EPOCHS = [10, 20, 30, 40, 50]
-    SEEDS = [1, 2, 3, 4, 5]
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     all_rows: list[Dict[str, Any]] = []
 
@@ -291,8 +301,8 @@ if __name__ == "__main__":
                 print(f"  Seed {seed}")
 
                 datasets = build_obstacle_split_datasets(
-                    h5_path=h5_path,
-                    master_index_path=master_index_path,
+                    h5_path=H5_PATH,
+                    master_index_path=MASTER_IDX_PATH,
                     seed=seed,
                 )
 
@@ -329,8 +339,7 @@ if __name__ == "__main__":
 
     raw_df = pd.DataFrame(all_rows)
 
-    raw_csv_path = output_dir / "trajectory_quality_raw_seed_results.csv"
-    raw_df.to_csv(raw_csv_path, index=False)
+    raw_df.to_csv(RAW_CSV_PATH, index=False)
 
     metric_mean_columns = [
         col for col in raw_df.columns
@@ -368,10 +377,7 @@ if __name__ == "__main__":
 
     full_df = pd.DataFrame(agg_rows)
 
-    full_csv_path = output_dir / "trajectory_quality_all_epochs.csv"
-    full_latex_path = output_dir / "trajectory_quality_all_epochs.tex"
-
-    full_df.to_csv(full_csv_path, index=False)
+    full_df.to_csv(FULL_CSV_PATH, index=False)
 
     full_df.drop(
         columns=[
@@ -380,7 +386,7 @@ if __name__ == "__main__":
         ],
         errors="ignore",
     ).to_latex(
-        full_latex_path,
+        FULL_LATEX_PATH,
         index=False,
         escape=False,
     )
@@ -416,10 +422,7 @@ if __name__ == "__main__":
 
     best_df = pd.DataFrame(best_rows)
 
-    best_csv_path = output_dir / "trajectory_quality_best_epochs.csv"
-    best_latex_path = output_dir / "trajectory_quality_best_epochs.tex"
-
-    best_df.to_csv(best_csv_path, index=False)
+    best_df.to_csv(BEST_CSV_PATH, index=False)
 
     best_df.drop(
         columns=[
@@ -428,7 +431,7 @@ if __name__ == "__main__":
         ],
         errors="ignore",
     ).to_latex(
-        best_latex_path,
+        BEST_LATEX_PATH,
         index=False,
         escape=False,
     )

@@ -164,69 +164,69 @@ def load_test_datasets(
 
     raise ValueError(f"Unknown model type: {model_type}")
 
+MODEL_PATHS = {
+    "IM1": {
+        "type": "inverse",
+        "path": "inverse.pt",
+    },
+    "IM2": {
+        "type": "inverse",
+        "path": "inverse2.pt",
+    },
+    "FM1": {
+        "type": "forward",
+        "path": "forward.pt",
+    },
+    "FM2": {
+        "type": "forward",
+        "path": "forward2.pt",
+    },
+
+    "TM1": {
+        "type": "trajectory",
+        "path": "model_0050.pt",
+    },
+    "TM2": {
+        "type": "trajectory",
+        "path": "model_0050.pt",
+    },
+    "TM3": {
+        "type": "trajectory",
+        "path": "model_0050.pt",
+    },
+    "TM4": {
+        "type": "trajectory",
+        "path": "model_0050.pt",
+    },
+    "TM5": {
+        "type": "trajectory",
+        "path": "model_0050.pt",
+    },
+}
+
+BABBLING_MASTER_INDEX_PATH = (
+    "dataset/test_babbling/test_babbling_master_index.csv"
+)
+
+BABBLING_H5_PATH= (
+    "dataset/test_babbling/worker_1.h5"
+)
+
+TRAJECTORY_MASTER_INDEX_PATH = (
+    "dataset/test_trajectory/test_trajectory_master_index.csv"
+)
+
+TRAJECTORY_H5_PATH = (
+    "dataset/test_trajectory/worker_1.h5"
+)
+
+OUTPUT_DIR = Path("plots/inference_time")
 
 if __name__ == "__main__":
 
-    device = "cuda"
+    device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    MODEL_PATHS = {
-        "IM1": {
-            "type": "inverse",
-            "path": "inverse.pt",
-        },
-        "IM2": {
-            "type": "inverse",
-            "path": "inverse2.pt",
-        },
-        "FM1": {
-            "type": "forward",
-            "path": "forward.pt",
-        },
-        "FM2": {
-            "type": "forward",
-            "path": "forward2.pt",
-        },
-
-        "TM1": {
-            "type": "trajectory",
-            "path": "model_0050.pt",
-        },
-        "TM2": {
-            "type": "trajectory",
-            "path": "model_0050.pt",
-        },
-        "TM3": {
-            "type": "trajectory",
-            "path": "model_0050.pt",
-        },
-        "TM4": {
-            "type": "trajectory",
-            "path": "model_0050.pt",
-        },
-        "TM5": {
-            "type": "trajectory",
-            "path": "model_0050.pt",
-        },
-    }
-
-    babbling_master_index_path = (
-        "dataset/test_babbling/test_babbling_master_index.csv"
-    )
-
-    babbling_h5_path = (
-        "dataset/test_babbling/worker_1.h5"
-    )
-
-    trajectory_master_index_path = (
-        "dataset/test_trajectory/test_trajectory_master_index.csv"
-    )
-
-    trajectory_h5_path = (
-        "dataset/test_trajectory/worker_1.h5"
-    )
-
-    output_dir = Path("plots/inference_time")
-    output_dir.mkdir(parents=True, exist_ok=True)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     timing_rows = []
 
@@ -242,13 +242,13 @@ if __name__ == "__main__":
 
         if model_info["type"] == "trajectory":
 
-            current_master_index_path = trajectory_master_index_path
-            current_h5_path = trajectory_h5_path
+            current_master_index_path = TRAJECTORY_MASTER_INDEX_PATH
+            current_h5_path = TRAJECTORY_H5_PATH
 
         else:
 
-            current_master_index_path = babbling_master_index_path
-            current_h5_path = babbling_h5_path
+            current_master_index_path = BABBLING_MASTER_INDEX_PATH
+            current_h5_path = BABBLING_H5_PATH
 
         no_obstacle_dataset, obstacle_collision_dataset, obstacle_avoidance_dataset = load_test_datasets(
             model_type=model_info["type"],
@@ -308,8 +308,8 @@ if __name__ == "__main__":
 
     timing_df = pd.DataFrame(timing_rows)
 
-    csv_path = output_dir / "inference_time_results.csv"
-    latex_path = output_dir / "inference_time_results.tex"
+    csv_path = OUTPUT_DIR / "inference_time_results.csv"
+    latex_path = OUTPUT_DIR / "inference_time_results.tex"
 
     timing_df.to_csv(
         csv_path,

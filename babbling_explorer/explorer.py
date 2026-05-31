@@ -342,7 +342,7 @@ class Explorer:
 
             transition = Transition(
                 state_t=state_vector,
-                action=get_action_vector(state_vector, new_state_vector, q_to - q_from),
+                action=get_action_vector(state_vector, new_state_vector, q_to),
                 state_t1=new_state_vector,
                 step_collision=(sampled_region == Region.CONTACT),
             )
@@ -371,18 +371,18 @@ class Explorer:
 
     def collect_data(
             self,
-            mode: str
+            change_setup: bool
     ) -> Optional[Episode]:
         """
         Collects babbling data. These transitions are represented by an episode. Each episode has randomly sampled
         number of transitions and starts in new initial configuration.
 
-        :param mode: Mode of collection - next means change the environment.
+        :param change_setup: Update poses of objects in the environment to change setup.
         :return: Babbling episode if one was finished.
         """
 
-        # If next, update env and clear cache
-        if mode == "next":
+        # If episode needs new setup, update env
+        if change_setup:
             self.mem_contact_transitions.clear()
             self.env.reset_until_reachable()
             self.update_env()
@@ -395,7 +395,7 @@ class Explorer:
         # Sample number of steps which are doubled if we want collision
         n_steps = int(np.random.randint(
             self.cfg.interval_n_steps_per_exploration[0],
-            self.cfg.interval_n_steps_per_exploration[1])
+            self.cfg.interval_n_steps_per_exploration[1] + 1)
         )
 
         # Collections are split if contact/free region

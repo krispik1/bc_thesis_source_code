@@ -22,6 +22,7 @@ def move_batch_to_device(
 def compute_inverse_metrics_per_category(
         dataloader: DataLoader,
         model: InverseModel,
+        device: str,
 ):
     total_q_sample_mae = 0.0
     total_mgt_sample_mae = 0.0
@@ -31,7 +32,7 @@ def compute_inverse_metrics_per_category(
 
     with torch.no_grad():
         for batch in dataloader:
-            batch = move_batch_to_device(batch, "cuda")
+            batch = move_batch_to_device(batch, device)
 
             x = batch["input"]
             target = batch["action"]
@@ -53,6 +54,7 @@ def compute_inverse_metrics_per_category(
 def compute_forward_metrics_per_category(
         dataloader: DataLoader,
         model: ForwardModel,
+        device: str,
 ):
     total_q_sample_mae = 0.0
     total_ef_pos_sample_mae = 0.0
@@ -68,7 +70,7 @@ def compute_forward_metrics_per_category(
     model.eval()
     with torch.no_grad():
         for batch in dataloader:
-            batch = move_batch_to_device(batch, "cuda")
+            batch = move_batch_to_device(batch, device)
 
             x = batch["input"]
             target = {
@@ -112,41 +114,48 @@ def compute_forward_metrics_per_category(
     }
 
 def compute_metrics_per_category(
-    dataloader: DataLoader,
-    model,
+        dataloader: DataLoader,
+        model,
+        device: str,
 ):
     if isinstance(model, InverseModel):
-        return compute_inverse_metrics_per_category(dataloader, model)
+        return compute_inverse_metrics_per_category(dataloader, model, device)
     if isinstance(model, ForwardModel):
-        return compute_forward_metrics_per_category(dataloader, model)
+        return compute_forward_metrics_per_category(dataloader, model, device)
     else:
         return {}
 
-if __name__ == "__main__":
+MODEL_PATHS = {
+    "IM1": {
+        "type": "inverse",
+        "path": "inverse.pt",
+    },
+    "IM2": {
+        "type": "inverse",
+        "path": "inverse2.pt",
+    },
+    "FM1": {
+        "type": "forward",
+        "path": "forward.pt",
+    },
+    "FM2": {
+        "type": "forward",
+        "path": "forward2.pt",
+    },
+}
 
-    MODEL_PATHS = {
-        "IM1": {
-            "type": "inverse",
-            "path": "inverse.pt",
-        },
-        "IM2": {
-            "type": "inverse",
-            "path": "inverse2.pt",
-        },
-        "FM1": {
-            "type": "forward",
-            "path": "forward.pt",
-        },
-        "FM2": {
-            "type": "forward",
-            "path": "forward2.pt",
-        },
-    }
+PLOT_DIR = Path("plots/one_step")
+
+H5_PATH = "dataset/test_babbling/worker_1.h5"
+MASTER_INDEX_PATH = "dataset/test_babbling/test_babbling_master_index.csv"
+
+if __name__ == "__main__":
 
     categories = ["No obstacle", "Colliding", "Non-colliding"]
 
-    plot_dir = Path("plots/one_step")
-    plot_dir.mkdir(parents=True, exist_ok=True)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    PLOT_DIR.mkdir(parents=True, exist_ok=True)
 
     inverse_table_rows = []
     forward_table_rows = []
@@ -157,12 +166,12 @@ if __name__ == "__main__":
 
         if model_info["type"] == "inverse":
             datasets = internal_test_sets(
-                "dataset/test_babbling/test_babbling_master_index.csv",
-                "dataset/test_babbling/worker_1.h5",
+                MASTER_INDEX_PATH,
+                H5_PATH,
                 "inverse"
             )
 
-            checkpoint = torch.load(model_info["path"], map_location="cuda")
+            checkpoint = torch.load(model_info["path"], map_location=device)
             cfg = checkpoint["config"]
 
             model = InverseModel(
@@ -174,12 +183,12 @@ if __name__ == "__main__":
 
         else:
             datasets = internal_test_sets(
-                "dataset/test_babbling/test_babbling_master_index.csv",
-                "dataset/test_babbling/worker_1.h5",
+                MASTER_INDEX_PATH,
+                H5_PATH,
                 "forward"
             )
 
-            checkpoint = torch.load(model_info["path"], map_location="cuda")
+            checkpoint = torch.load(model_info["path"], map_location=device)
             cfg = checkpoint["config"]
 
             model = ForwardModel(
@@ -192,7 +201,7 @@ if __name__ == "__main__":
             )
 
         model.load_state_dict(checkpoint["model_state_dict"])
-        model.to("cuda")
+        model.to(device)
         model.eval()
 
         for param in model.parameters():
@@ -208,7 +217,7 @@ if __name__ == "__main__":
         category_results = {}
 
         for category, dataloader in zip(categories, dataloaders):
-            result = compute_metrics_per_category(dataloader, model)
+            result = compute_metrics_per_category(dataloader, model, device)
 
             for metric_name, value in result.items():
                 if metric_name not in category_results:
@@ -256,7 +265,7 @@ if __name__ == "__main__":
             )
 
             plt.savefig(
-                plot_dir / f"{model_name}_{safe_metric_name}_one_step.pdf"
+                PLOT_DIR / f"{model_name}_{safe_metric_name}_one_step.pdf"
             )
 
             plt.close()
@@ -264,8 +273,8 @@ if __name__ == "__main__":
     inverse_df = pd.DataFrame(inverse_table_rows)
     inverse_df = inverse_df.sort_values("model")
 
-    inverse_csv_path = plot_dir / "inverse_one_step_results.csv"
-    inverse_latex_path = plot_dir / "inverse_one_step_results.tex"
+    inverse_csv_path = PLOT_DIR / "inverse_one_step_results.csv"
+    inverse_latex_path = PLOT_DIR / "inverse_one_step_results.tex"
 
     inverse_df.to_csv(inverse_csv_path, index=False)
 
@@ -278,8 +287,8 @@ if __name__ == "__main__":
     forward_df = pd.DataFrame(forward_table_rows)
     forward_df = forward_df.sort_values("model")
 
-    forward_csv_path = plot_dir / "forward_one_step_results.csv"
-    forward_latex_path = plot_dir / "forward_one_step_results.tex"
+    forward_csv_path = PLOT_DIR / "forward_one_step_results.csv"
+    forward_latex_path = PLOT_DIR / "forward_one_step_results.tex"
 
     forward_df.to_csv(forward_csv_path, index=False)
 

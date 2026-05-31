@@ -88,7 +88,7 @@ def cross_validation(
             train_loader=train_loader,
             val_loader=val_loader,
             cfg=cfg,
-            checkpoint_path=checkpoint_dir,
+            checkpoint_dir=checkpoint_dir,
             forward_model_path=forward_model_path,
             inverse_model_path=inverse_model_path,
             logger=logger,
@@ -269,7 +269,7 @@ def fit_model(
         train_loader: DataLoader,
         val_loader: DataLoader,
         cfg: ModelTrainConfig,
-        checkpoint_path: str,
+        checkpoint_dir: str,
         forward_model_path: str,
         inverse_model_path: str,
         logger: Logger,
@@ -284,7 +284,7 @@ def fit_model(
     :param train_loader: Train data loader.
     :param val_loader: Validation data loader.
     :param cfg: Config of the model - forward, inverse or trajectory.
-    :param checkpoint_path: Checkpoint path.
+    :param checkpoint_dir: Checkpoint dir path.
     :param forward_model_path: Forward model path if needed.
     :param inverse_model_path: Inverse model path if needed.
     :param logger: Logger object.
@@ -300,7 +300,7 @@ def fit_model(
             train_loader=train_loader,
             val_loader=val_loader,
             cfg=cfg,
-            checkpoint_path=checkpoint_path,
+            checkpoint_dir=checkpoint_dir,
             forward_model_path=forward_model_path,
             inverse_model_path=inverse_model_path,
             logger=logger,
@@ -314,10 +314,10 @@ def fit_model(
             train_loader=train_loader,
             val_loader=val_loader,
             cfg=cfg,
-            checkpoint_path=checkpoint_path,
+            checkpoint_dir=checkpoint_dir,
             plots_dir=plots_dir,
             logger=logger,
-            k=run_id+1,
+            run_id=run_id+1,
             results_path=str(Path(results_dir) / "inverse_model_history.csv")
         )
     elif isinstance(cfg, ForwardModelTrainConfig):
@@ -326,10 +326,10 @@ def fit_model(
             train_loader=train_loader,
             val_loader=val_loader,
             cfg=cfg,
-            checkpoint_path=checkpoint_path,
+            checkpoint_dir=checkpoint_dir,
             plots_dir=plots_dir,
             logger=logger,
-            k=run_id+1,
+            run_id=run_id+1,
             results_path=str(Path(results_dir) / "forward_model_history.csv")
         )
     else:

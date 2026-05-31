@@ -160,6 +160,9 @@ class GymWrapper(GymEnv):
 
         success = 0
 
+        if not self.get_distractors_positions():
+            return True
+
         for _ in range(n_samples):
             # Sample point on distractor
             sample = self.sample_surface_point_ray()
@@ -203,15 +206,15 @@ class GymWrapper(GymEnv):
             # Check whether both distractor and goal object are reachable
             if self._is_goal_reachable():
                 self.soft_reset_robot_only()
-                #if not self._is_distractor_reachable():
-                #   continue
+                if not self._is_distractor_reachable():
+                   continue
 
                 # Calculate poses and check if they are valid meaning no collision with distractor
                 candidate_goal_poses = [self.robot.calculate_accurate_IK(self.get_goal_position())]
                 goal_poses = []
                 for goal_pose in candidate_goal_poses:
-                    #if goal_pose is None:
-                   #     continue
+                    if goal_pose is None:
+                       continue
                     # Teleport robot to pose and check for collision
                     self.set_robot_configuration_kinematic(goal_pose)
                     if self.check_robot_distractor_collision() or self.check_robot_distractor_penetration()\

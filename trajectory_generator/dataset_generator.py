@@ -23,11 +23,15 @@ class DatasetGenerator:
         self.env = env
         self.cfg = cfg
 
+        # Obstacle flag
+        self.no_obstacle = not bool(cfg.obstacle_present)
+
         # Initialize planner and episode generator
         self.planner = Planner(env, self.cfg)
         self.episode_gen = EpisodeRunner(env, self.cfg)
 
         # Bookkeeping for balancing the ratio
+        self._desired_collision_ratio = self.cfg.target_collision_ratio
         self._n_collision = 0
         self._n_non_collision = 0
         self.episode_index = 0
@@ -44,7 +48,7 @@ class DatasetGenerator:
 
     def collect_data(
             self,
-            mode: PlannerMode
+            change_setup: bool,
     ) -> Optional[Episode]:
         """
         Runs data collection episodes, each with new trajectory the robot follows. These episodes are divided into
@@ -56,19 +60,28 @@ class DatasetGenerator:
             - RRT - Trajectory created by Rapidly-exploring Random Trees,
             - Waypoint + RRT - generated waypoints are used for detouring, increases randomization.
 
-        :param mode: Possibility to choose mode of the planner.
+        :param change_setup: Update poses of objects in the environment to change setup.
         :return: Collected data of episodes represented by list of observations given by transitions (s_t -> a_t -> s_t1)
         and collision flag (True only if collision), information about the planner and success of the robot if trajectory
         was found.
         """
-        # Update environment
-        self.env.reset_until_reachable()
-        self.update_env()
+
+        # If episode needs new setup, update env
+        if change_setup:
+            self.env.reset_until_reachable()
+            self.update_env()
+        else:
+            self.env.soft_reset_robot_only()
 
         current_collision_ratio = 0
         # Prevent division by 0
-        if self._n_non_collision != 0:
-            current_collision_ratio = self._n_collision / self._n_non_collision
+        if self.episode_index != 0:
+            current_collision_ratio = self._n_collision / self.episode_index
+
+        if current_collision_ratio < self._desired_collision_ratio and not self.no_obstacle:
+            mode = PlannerMode.COLLIDE
+        else:
+            mode = PlannerMode.AVOID
 
         trajectory, n_waypoints = self.planner.plan(
             current_collision_ratio=current_collision_ratio,
@@ -86,7 +99,8 @@ class DatasetGenerator:
         )
 
         # If episode is valid, count it
-        if len(episode.transitions) > 0:
+        if len(episode.transitions) > 0 and mode == episode.episode_collision:
+
             # Bookkeep for choosing modes and number of waypoints
             self.n_waypoints_in_trajectories[n_waypoints] += 1
             if episode.episode_collision:
@@ -95,4 +109,6 @@ class DatasetGenerator:
                 self._n_non_collision += 1
             self.episode_index += 1
 
-        return episode
+            return episode
+
+        return None

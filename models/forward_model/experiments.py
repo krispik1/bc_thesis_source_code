@@ -97,9 +97,9 @@ def run_forward_model_experiments(
             train_loader=train_loader,
             val_loader=val_loader,
             cfg=cfg,
-            checkpoint_path=checkpoint_dir,
+            checkpoint_dir=checkpoint_dir,
             logger=logger,
-            k=run_id,
+            run_id=run_id,
             plots_dir=plots_dir,
             results_path=str(Path(results_dir) / f"forward_model_sweep_histories.csv"),
         )

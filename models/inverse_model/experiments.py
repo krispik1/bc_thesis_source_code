@@ -97,11 +97,11 @@ def run_inverse_model_experiments(
             train_loader=train_loader,
             val_loader=val_loader,
             cfg=cfg,
-            checkpoint_path=checkpoint_dir,
+            checkpoint_dir=checkpoint_dir,
             logger=logger,
             plots_dir=plots_dir,
             results_path=str(Path(results_dir) / f"inverse_model_sweep_histories.csv"),
-            k=run_id,
+            run_id=run_id,
         )
 
         best_val_loss = min(history["val_loss_total"])

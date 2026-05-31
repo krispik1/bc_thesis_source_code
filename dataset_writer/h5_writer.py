@@ -56,7 +56,11 @@ class H5Writer:
         :return: Pointer to the dataset.
         """
         if column_name in self.file_group:
-            return self.file_group[column_name]
+            ds = self.file_group[column_name]
+            expected_shape = column_specification.shape
+            if ds.shape[1:] != expected_shape or ds.dtype != np.dtype(column_specification.dtype):
+                raise ValueError()
+            return ds
 
         chunks = (self.chunks, *column_specification.shape) if column_specification.shape else (self.chunks,)
 

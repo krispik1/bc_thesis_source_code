@@ -81,7 +81,6 @@ def is_dummy_obstacle(
     obstacle = np.asarray(obstacle6D, dtype=np.float64)
     return np.allclose(obstacle, np.asarray([-2, -2, -2, -2, -2, -2, -2], dtype=np.float64), atol=atol, rtol=0.0)
 
-
 def build_master_episode_index(
     h5_paths: Iterable[str | Path],
     output_path: str | Path,
@@ -118,7 +117,7 @@ def build_master_episode_index(
             n_episodes = ep_env_id.shape[0]
 
             for episode_id in range(n_episodes):
-                env_id = episode_id
+                env_id = int(ep_env_id[episode_id])
                 start = int(ep_start[episode_id])
                 length = int(ep_len[episode_id])
 

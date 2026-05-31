@@ -501,7 +501,7 @@ def load_trajectory_model(checkpoint_path: str | Path, device: str):
         dimension_gru=cfg["d_gru"],
         output_layers=cfg["output_layers"],
         device=device,
-        head_hidden_dimension=cfg["hidden_head_dimension"],
+        hidden_head_dimension=cfg["hidden_head_dimension"],
         n_timesteps=cfg["n_timesteps"],
     )
 
@@ -860,31 +860,32 @@ def evaluate_model_in_simulator(
 
     return result
 
+SEEDS = [1]
+
+MODEL_PATHS = {
+    "TM1_epoch50": "model_0050.pt",
+    #"TM2_epoch50": "model_0050.pt",
+    #"TM3_epoch50": "model_0050.pt",
+    #"TM4_epoch50": "model_0050.pt",
+    #"TM5_epoch50": "model_0050.pt",
+}
+
+CFG_PATH = "training_data_generation.json"
+
+DATA_DIR = Path(
+    "dataset/test_trajectory"
+)
+
+H5_PATH = str(DATA_DIR / "worker_1.h5")
+MASTER_INDEX_PATH = str(DATA_DIR / "test_trajectory_master_index.csv")
+
+OUTPUT_DIR = Path("plots/simulator_eval/repeated4")
 
 if __name__ == "__main__":
-    SEEDS = [1]
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    CFG_PATH = "training_data_generation.json"
-
-    DATA_DIR = Path(
-        "dataset/test_trajectory"
-    )
-
-    H5_PATH = str(DATA_DIR / "worker_1.h5")
-    MASTER_INDEX_PATH = str(DATA_DIR / "test_trajectory_master_index.csv")
-
-    OUTPUT_DIR = Path("plots/simulator_eval/repeated4")
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
-    MODEL_PATHS = {
-        "TM1_epoch50": "model_0050.pt",
-        #"TM2_epoch50": "model_0050.pt",
-        #"TM3_epoch50": "model_0050.pt",
-        #"TM4_epoch50": "model_0050.pt",
-        #"TM5_epoch50": "model_0050.pt",
-    }
 
     datasets = build_obstacle_split_datasets(
         h5_path=H5_PATH,

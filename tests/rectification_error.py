@@ -74,6 +74,7 @@ def test_rectification_error(
 
     return results
 
+# Also include which is inverse/forward
 MODEL_PATHS = {
     "FM1 + IM1": {
         "forward": "forward.pt",
@@ -93,9 +94,22 @@ MODEL_PATHS = {
     },
 }
 
+DATA_FILE = Path(
+        "dataset/trajectory/trajectory_dataset.h5"
+    )
+
+DATA_IDX_FILE = Path(
+        "dataset/trajectory/trajectory_master_index_file.csv"
+    )
+
+SEEDS = [1, 2, 3, 4, 5]
+
+CSV_PATH = "plots/rectification/rectification_results.csv"
+LATEX_PATH = "plots/rectification/rectification_results.tex"
+
 if __name__ == "__main__":
 
-    device = "cuda"
+    device = "cuda" if torch.cuda.is_available() else "cpu"
 
     name_dict = {
         "configuration_rectification_mae": r'$\mathbf{\theta}$ MAE[rad]',
@@ -115,12 +129,6 @@ if __name__ == "__main__":
         "obstacle6D_position_rectification_l2": r'$\mathbf{o}_{xyz}$ L2[m]',
         "obstacle6D_rotation_rectification_l2": r'$\mathbf{o}_{R}$ L2',
     }
-
-    DATA_DIR = Path(
-        "dataset/trajectory"
-    )
-
-    seeds = [1, 2, 3, 4, 5]
 
     table_rows = []
 
@@ -174,10 +182,10 @@ if __name__ == "__main__":
 
         all_results = []
 
-        for seed in seeds:
+        for seed in SEEDS:
             train_dataset, val_dataset, _ = trajectory_sweep_dataset(
-                h5_file_path=str(DATA_DIR / "worker_1.h5"),
-                master_index_df_path=str(DATA_DIR / "trajectory_master_index.csv"),
+                h5_file_path=str(DATA_FILE),
+                master_index_df_path=str(DATA_IDX_FILE),
                 n_trajectories=13000,
                 target_no_obstacle_ratio=0.1,
                 seed=seed,
@@ -261,16 +269,14 @@ if __name__ == "__main__":
             )
 
     df = pd.DataFrame(table_rows)
-    csv_path = "plots/rectification/rectification_results.csv"
 
     df.to_csv(
-        csv_path,
+        CSV_PATH,
         index=False,
     )
-    latex_path = "plots/rectification/rectification_results.tex"
 
     df.to_latex(
-        latex_path,
+        LATEX_PATH,
         index=False,
         escape=False,
     )

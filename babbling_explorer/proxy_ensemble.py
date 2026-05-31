@@ -146,7 +146,7 @@ class ProxyEnsemble:
         :param steps: Number of training steps.
         """
 
-        if len(batch) < steps:
+        if len(batch) == 0:
             return
 
         for _ in range(steps):
